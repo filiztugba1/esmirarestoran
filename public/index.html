@@ -1,57 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="./images/favicon.ico">
 
-    <title>Riday - Dashboard</title>
-  
-	<!-- Vendors Style-->
-	<link rel="stylesheet" href="./css/vendors_css.css">
-	  
-	<!-- Style-->  
-	<link rel="stylesheet" href="./css/style.css">
-	<link rel="stylesheet" href="./css/skin_color.css">	
-<style>
-  .multinav-scroll {
-  overflow-y: auto;
-  height: calc(100vh - 50px); /* Yüksekliği header ve diğer öğelere göre ayarlayın */
-}
-.slimScrollDiv {
-  overflow-y: auto;
-  height: calc(100vh - 50px); /* Yüksekliği header ve diğer öğelere göre ayarlayın */
-}
-.modal-content{
-  height: calc(100vh - 50px); /* Yüksekliği header ve diğer öğelere göre ayarlayın */
-}
-.modal-body{
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: calc(100vh - 50px); /* Yüksekliği header ve diğer öğelere göre ayarlayın */
-}
-.iradio_flat-green{
-  margin-right: 5px;
-}
-.modal-body {
-    padding: 2rem;
-}
-.form-radio-style{
-    border: 1px solid #bababa;
-    border-radius: 4px;
-    padding: 7px 3px 3px 8px;
-}
-</style>
-  </head>
-  <body class="hold-transition light-skin sidebar-mini theme-danger fixed">
-    <!-- <body class="hold-transition theme-primary bg-img" style="background-image: url(../images/auth-bg/bg-1.jpg)"> -->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="./images/favicon.ico">
 
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" style="height: 100%;"></div>
-    <!--
+  <title>Riday - Dashboard</title>
+
+  <!-- Vendors Style-->
+  <link rel="stylesheet" href="./css/vendors_css.css">
+
+  <!-- Style-->
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/skin_color.css">
+  <style>
+    .multinav-scroll {
+      overflow-y: auto;
+      height: calc(100vh - 50px);
+      /* Yüksekliği header ve diğer öğelere göre ayarlayın */
+    }
+
+    .slimScrollDiv {
+      overflow-y: auto;
+      height: calc(100vh - 50px);
+      /* Yüksekliği header ve diğer öğelere göre ayarlayın */
+    }
+
+    .modal-content {
+      height: calc(100vh - 50px);
+      /* Yüksekliği header ve diğer öğelere göre ayarlayın */
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: calc(100vh - 50px);
+      /* Yüksekliği header ve diğer öğelere göre ayarlayın */
+    }
+
+    .iradio_flat-green {
+      margin-right: 5px;
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .form-radio-style {
+      border: 1px solid #bababa;
+      border-radius: 4px;
+      padding: 7px 3px 3px 8px;
+    }
+  </style>
+</head>
+
+<body class="hold-transition light-skin sidebar-mini theme-danger fixed">
+  <!-- <body class="hold-transition theme-primary bg-img" style="background-image: url(../images/auth-bg/bg-1.jpg)"> -->
+
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root" style="height: 100%;"></div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -61,8 +73,8 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-      	<!-- Vendor JS -->
-	<!-- <script src="./js/vendors.min.js"></script>
+  <!-- Vendor JS -->
+  <!-- <script src="./js/vendors.min.js"></script>
 	<script src="./js/pages/chat-popup.js"></script>
 	<script src="./assets/vendor_components/apexcharts-bundle/dist/apexcharts.min.js"></script>
     <script src="./assets/icons/feather-icons/feather.min.js"></script>	
@@ -72,47 +84,52 @@
 	<script src="./js/template.js"></script> -->
 
 
-  	<!-- Vendor JS -->
-	<script src="./js/vendors.min.js"></script>
-	<script src="./js/pages/chat-popup.js"></script>
-	<script src="./assets/vendor_components/apexcharts-bundle/dist/apexcharts.min.js"></script>
-    <script src="./assets/icons/feather-icons/feather.min.js"></script>	
-	
-	<script src="./assets/vendor_components/OwlCarousel2/dist/owl.carousel.js"></script>
-	<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-	<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
-	<script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
-	<script src="https://cdn.amcharts.com/lib/4/themes/kelly.js"></script>
-	<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-	
-	<!-- Riday App -->
-	<script src="./js/template.js"></script>
-	<!-- <script src="./js/pages/dashboard.js"></script> -->
-      
+  <!-- Vendor JS -->
+  <script src="./js/vendors.min.js"></script>
+  <script src="./js/pages/chat-popup.js"></script>
+  <script src="./assets/vendor_components/apexcharts-bundle/dist/apexcharts.min.js"></script>
+  <script src="./assets/icons/feather-icons/feather.min.js"></script>
+
+  <script src="./assets/vendor_components/OwlCarousel2/dist/owl.carousel.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/kelly.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+
+
+  <!-- Riday App -->
+  <!-- <script src="./js/template.js"></script> -->
+  <!-- <script src="./js/pages/dashboard.js"></script> -->
+
 
 
 
   <script src="./js/vendors.min.js"></script>
-	<script src="./js/pages/chat-popup.js"></script>
-	<script src="./assets/vendor_components/apexcharts-bundle/dist/apexcharts.min.js"></script>
-    <script src="./assets/icons/feather-icons/feather.min.js"></script>	<script src="../assets/vendor_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
-	<script src="./assets/vendor_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.js"></script>
-	<script src="./assets/vendor_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js"></script>
-	<script src="./assets/vendor_components/select2/dist/js/select2.full.js"></script>
-	<script src="./assets/vendor_plugins/input-mask/jquery.inputmask.js"></script>
-	<script src="./assets/vendor_plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
-	<script src="./assets/vendor_plugins/input-mask/jquery.inputmask.extensions.js"></script>
-	<script src="./assets/vendor_components/moment/min/moment.min.js"></script>
-	<script src="./assets/vendor_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-	<script src="./assets/vendor_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-	<script src="./assets/vendor_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
-	<script src="./assets/vendor_plugins/timepicker/bootstrap-timepicker.min.js"></script>
-	<script src="./assets/vendor_plugins/iCheck/icheck.min.js"></script>
-	
-	<!-- Riday App -->
-	<!-- <script src="./js/template.js"></script> -->
-	
-	<script src="./js/pages/advanced-form-element.js"></script>
+  <script src="./js/pages/chat-popup.js"></script>
+  <script src="./assets/vendor_components/apexcharts-bundle/dist/apexcharts.min.js"></script>
+  <script src="./assets/icons/feather-icons/feather.min.js"></script>
+  <script src="../assets/vendor_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+  <script src="./assets/vendor_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.js"></script>
+  <script src="./assets/vendor_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js"></script>
+  <script src="./assets/vendor_components/select2/dist/js/select2.full.js"></script>
+  <script src="./assets/vendor_plugins/input-mask/jquery.inputmask.js"></script>
+  <script src="./assets/vendor_plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+  <script src="./assets/vendor_plugins/input-mask/jquery.inputmask.extensions.js"></script>
+  <script src="./assets/vendor_components/moment/min/moment.min.js"></script>
+  <script src="./assets/vendor_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+  <script src="./assets/vendor_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+  <script src="./assets/vendor_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
+  <script src="./assets/vendor_plugins/timepicker/bootstrap-timepicker.min.js"></script>
+  <script src="./assets/vendor_plugins/iCheck/icheck.min.js"></script>
 
-  </body>
+  <!-- Riday App -->
+  <!-- <script src="./js/template.js"></script> -->
+
+  <script src="./js/pages/advanced-form-element.js"></script>
+
+</body>
+
 </html>

@@ -1,5 +1,73 @@
-import React from 'react' 
-function Header() {
+import React, { useEffect, useState } from 'react';
+import { Dropdown } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom"; 
+
+import axios from 'axios';
+function Header() { 
+	const [data, setData] = useState([]); // Veriyi saklamak için state
+	const [loading, setLoading] = useState(true); // Yükleme durumu
+	const [error, setError] = useState(null); // Hata durumu
+	const navigate = useNavigate();
+	const token = localStorage.getItem('token');
+	console.log("header token:"+ token);
+	if(token==null){
+		window.location.href = '/Login';
+		localStorage.setItem('giris', 0);
+	}
+	  useEffect(() => {
+		const fetchData = async () => {
+		  try {
+			const response = await axios.get('http://siparisbankasi.com/firm', {
+			  headers: {
+				Authorization: `Bearer ${token}`,
+			  },
+			});
+			localStorage.setItem('firmid', response.data.company_id);
+		
+			setData(response.data); // Gelen veriyi state'e aktar
+			setLoading(false); // Yükleme tamamlandı
+		  } catch (err) {
+			const status = err.response.status;
+
+			if (status === 401 || status===400 ||token==null) {
+			  window.location.href = '/Login';
+			  localStorage.setItem('giris', 0);
+			}
+			setError(err.message); // Hata durumunu sakla
+			setLoading(false);
+		  }
+		};
+	
+		fetchData();
+	  }, []);
+	  const handleLogout = async () => {
+		try {
+		  // Token'i alın (örneğin, localStorage'dan)
+		 
+	  console.log("cıkıs tokeni="+token);
+		  // Logout API çağrısı
+		  const response = await axios.get('http://siparisbankasi.com/logout', {
+			headers: {
+				Authorization: `Bearer ${token}`, // Bearer Token başlığı ekle
+			},
+
+		});
+		console.log( "status=" +response.status);
+	  
+		  if (response.status === 200) {
+			alert("Başarıyla çıkış yapıldı!");
+			localStorage.removeItem("token"); // Token'i temizleme
+			window.location.href = '/Login';
+			localStorage.setItem('giris', 0);
+		  }
+		} catch (error) {
+		  console.error("Çıkış işlemi sırasında bir hata oluştu:", error);
+		  alert("Çıkış işlemi başarısız. Tekrar deneyin.");
+		}
+	  };
+	  
+    
     return (
         <header className="main-header">
 	<div className="d-flex align-items-center logo-box justify-content-start">
@@ -220,21 +288,38 @@ function Header() {
 			  	<span className="icon-Layout-left-panel-1"><span className="path1"></span><span className="path2"></span></span>
 			  </a>
           </li>
-          <li className="dropdown user user-menu">
-            <a href="#" className="dropdown-toggle p-0 text-dark hover-primary ml-md-30 ml-10" data-toggle="dropdown" title="User">
-				<span className="pl-30 d-md-inline-block d-none">Hello,</span> <strong className="d-md-inline-block d-none">Alia</strong>
-                <img src="../images/avatar/avatar-11.png" className="user-image rounded-circle avatar bg-white mx-10" alt="User Image" />
-            </a>
-            <ul className="dropdown-menu animated flipInX">
-              <li className="user-body">
-				 <a className="dropdown-item" href="#"><i className="ti-user text-muted mr-2"></i> Profile</a>
-				 <a className="dropdown-item" href="#"><i className="ti-wallet text-muted mr-2"></i> My Wallet</a>
-				 <a className="dropdown-item" href="#"><i className="ti-settings text-muted mr-2"></i> Settings</a>
-				 <div className="dropdown-divider"></div>
-				 <a className="dropdown-item" href="#"><i className="ti-lock text-muted mr-2"></i> Logout</a>
-              </li>
-            </ul>
-          </li>	
+		  <Dropdown className="dropdown user user-menu">
+      <Dropdown.Toggle
+        variant="link"
+        id="dropdown-basic"
+        className="dropdown-toggle p-0 text-dark hover-primary ml-md-30 ml-10"
+      >
+        <span className="pl-30 d-md-inline-block d-none"></span>
+        <strong className="d-md-inline-block d-none">{data.company_name}</strong>
+        <img
+          src="../images/avatar/avatar-11.png"
+          className="user-image rounded-circle avatar bg-white mx-10"
+          alt="User"
+        />
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu className="dropdown-menu animated flipInX">
+        <Dropdown.Item href="#/profile" className="dropdown-item">
+          <i className="ti-user text-muted mr-2"></i> Profile
+        </Dropdown.Item>
+        <Dropdown.Item href="#/wallet" className="dropdown-item">
+          <i className="ti-wallet text-muted mr-2"></i> My Wallet
+        </Dropdown.Item>
+        <Dropdown.Item href="#/settings" className="dropdown-item">
+          <i className="ti-settings text-muted mr-2"></i> Settings
+        </Dropdown.Item>
+        <Dropdown.Divider className="dropdown-divider" />
+        <Dropdown.Item onClick={handleLogout} className="dropdown-item">
+          <i className="ti-lock text-muted mr-2"></i> Logout
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+      	
 			
         </ul>
       </div>

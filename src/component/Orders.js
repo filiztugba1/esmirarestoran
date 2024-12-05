@@ -1,5 +1,110 @@
-import React, { useState } from 'react'
+
+
+import React, { useState ,useEffect } from 'react';
+import axios from 'axios';
+import DataTable from 'react-data-table-component';
 function Orders() {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+    const fetchData = async () => {
+        const token = localStorage.getItem('token'); // Token'ı localStorage'dan al
+
+        try {
+            const response = await axios.get('http://siparisbankasi.com/orders', {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Bearer Token başlığı ekle
+                },
+
+            });
+            console.log('Data:', response.data);
+            console.log('Status:', response.status);
+            setData(response.data); // Gelen veriyi tablo için sakla
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            const status = error.status;
+            console.log("eeeee="+status);
+           
+            setLoading(false);
+            if (status === 401 || status === 400 || status===undefined) {
+                window.location.href = '/Login';
+                localStorage.setItem('giris', 0);
+            }
+        }
+    };
+
+    fetchData();
+}, []);
+
+
+    const columns = [
+        {
+            name: 'Sipariş id',
+            selector: row => row.orderid,
+            sortable: true, // Sıralanabilir
+        },
+        {
+            name: 'Sipariş türü',
+            selector: row => row.ordertype,
+            sortable: true,
+        },
+        {
+            name: 'Teslim zamanı',
+            selector: row => row.deliverytime,
+            sortable: true,
+        },
+        {
+            name: 'Telefon',
+            selector: row => row.userphone,
+            sortable: true,
+        },
+
+        {
+            name: 'Tutar',
+            selector: row => row.generalamount,
+            sortable: true,
+        },
+
+        {
+            name: 'Ödeme tipi',
+            selector: row => row.paymentcode,
+            sortable: true,
+        },
+
+        {
+            name: 'Üye',
+            selector: row => row.username,
+            sortable: true,
+        },
+
+        {
+            name: 'Kurye',
+            selector: row => row.namesurname,
+            sortable: true,
+        },
+        {
+            name: 'Durum',
+            selector: row => row.courieroperation,
+            sortable: true,
+        },
+
+        {
+            name: 'Adres',
+            selector: row => row.address,
+            sortable: true,
+        },
+
+        {
+            name: 'Tarih',
+            selector: row => row.paymenttime,
+            sortable: true,
+        },
+    ];
+
+
+
+
     const [openOrderModal, setOpenOrderModal] = useState({
         show: "",
         display: "none",
@@ -78,111 +183,12 @@ function Orders() {
                                 <div className="box">
                                     <div className="box-body px-0">
                                         <div className="table-responsive rounded card-table">
-                                            <table className="table border-no" id="example1">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Sipariş ID</th>
-                                                        <th>Tür</th>
-                                                        <th>T.Zaman</th>
-                                                        <th>Telefon</th>
-                                                        <th>Tutar</th>
-                                                        <th>Ödeme Tipi</th>
-                                                        <th>Üye Adı Soyadı</th>
-                                                        <th>Kurye</th>
-                                                        <th>Durum</th>
-                                                        <th>Adres / Açıklama</th>
-                                                        <th>Tarih / Saat</th>
-                                                        <th></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr className="hover-primary">
-                                                        <td>#245879</td>
-                                                        <td>Masa Sipariş</td>
-                                                        <td>05-08-2024 15:30</td>
-                                                        <td>5534444072</td>
-                                                        <td>70.50</td>
-                                                        <td>Nakit</td>
-                                                        <td>Filiz Çürükcü</td>
-                                                        <td>Filiz Bedir</td>
-                                                        <td>
-                                                            <span className="badge badge-pill badge-primary-light">Teslim edildi</span>
-                                                        </td>
-
-
-                                                        <td>1623 E Updahl Ct, Harrison, ID, 83833</td>
-                                                        <td>05-08-2024 14:30</td>
-
-                                                        <td>
-                                                            <div className="btn-group">
-                                                                <a className="hover-primary dropdown-toggle no-caret" data-toggle="dropdown"><i className="fa fa-ellipsis-h"></i></a>
-                                                                <div className="dropdown-menu">
-                                                                    <a className="dropdown-item" href="#">Siparişi Onayla</a>
-                                                                    <a className="dropdown-item" href="#">Siparişi Reddet</a>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr className="hover-primary">
-                                                        <td>#245879</td>
-                                                        <td>Masa Sipariş</td>
-                                                        <td>05-08-2024 15:30</td>
-                                                        <td>5534444072</td>
-                                                        <td>70.50</td>
-                                                        <td>Nakit</td>
-                                                        <td>Filiz Çürükcü</td>
-                                                        <td>Filiz Bedir</td>
-                                                        <td>
-                                                            <span className="badge badge-pill badge-danger-light">Yeni Sipariş</span>
-                                                        </td>
-
-
-                                                        <td>1623 E Updahl Ct, Harrison, ID, 83833</td>
-                                                        <td>05-08-2024 14:30</td>
-
-                                                        <td>
-                                                            <div className="btn-group">
-                                                                <a className="hover-primary dropdown-toggle no-caret" data-toggle="dropdown"><i className="fa fa-ellipsis-h"></i></a>
-                                                                <div className="dropdown-menu">
-                                                                    <a className="dropdown-item" href="#">Siparişi Onayla</a>
-                                                                    <a className="dropdown-item" href="#">Siparişi Reddet</a>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr className="hover-primary">
-                                                        <td>#245879</td>
-                                                        <td>Masa Sipariş</td>
-                                                        <td>05-08-2024 15:30</td>
-                                                        <td>5534444072</td>
-                                                        <td>70.50</td>
-                                                        <td>Nakit</td>
-                                                        <td>Filiz Çürükcü</td>
-                                                        <td>Filiz Bedir</td>
-                                                        <td>
-                                                            <span className="badge badge-pill badge-warning-light">Teslimatta</span>
-                                                        </td>
-
-
-                                                        <td>1623 E Updahl Ct, Harrison, ID, 83833</td>
-                                                        <td>05-08-2024 14:30</td>
-
-                                                        <td>
-                                                            <div className="btn-group">
-                                                                <a className="hover-primary dropdown-toggle no-caret" data-toggle="dropdown"><i className="fa fa-ellipsis-h"></i></a>
-                                                                <div className="dropdown-menu">
-                                                                    <a className="dropdown-item" href="#">Siparişi Onayla</a>
-                                                                    <a className="dropdown-item" href="#">Siparişi Reddet</a>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-
-
-
-
-                                                </tbody>
-                                            </table>
+                                            <DataTable
+                                                columns={columns} // Tablo kolonları
+                                                data={data} // Çekilen veri
+                                                pagination // Sayfalandırmayı etkinleştir
+                                                highlightOnHover // Satır üzerine gelince vurgula
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -209,8 +215,8 @@ function Orders() {
                             <form onSubmit={handleSubmit}>
                                 <div className='row'>
                                     <div className='col-md-9 modal-content-1'>
-                                    <h5>Üye seçiniz</h5>
-                                        <hr/>
+                                        <h5>Üye seçiniz</h5>
+                                        <hr />
                                         <div className='row'>
                                             <div className='col-md-6'>
                                                 <div className='row'>
@@ -520,8 +526,8 @@ function Orders() {
                             </form>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-success text-right" style={{float:'right'}}>Sipariş Onay</button>
-                            <button type="button" className="btn btn-primary text-right" style={{float:'right'}}>Sipariş Yazdır</button>
+                            <button type="button" className="btn btn-success text-right" style={{ float: 'right' }}>Sipariş Onay</button>
+                            <button type="button" className="btn btn-primary text-right" style={{ float: 'right' }}>Sipariş Yazdır</button>
                         </div>
                     </div>
                 </div>

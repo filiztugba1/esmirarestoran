@@ -1,5 +1,83 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 function Products() {
+
+    const [product, setProduct] = useState({
+        product_name	: "",
+        product_barcode:"",
+        product_price: 0.0,
+        category_id: 0,
+        firmid:0,
+        product_order:0,
+        product_show:0,
+        product_image: null, // Görsel dosyası
+      });
+
+    const [products, setProducts] = useState([]); // Veriyi saklamak için state
+    const [modalTitle, setModalTitle] = useState("Yeni Ürün");
+  
+    const [categories, setCategories] = useState([]);
+	const [loading, setLoading] = useState(true); // Yükleme durumu
+	const [error, setError] = useState(null); // Hata durumu
+    const [success, setSuccess] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null); 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setProduct({ ...product, [name]: value });
+        console.log(name, value);
+      };
+      
+      const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setProduct({ ...product, product_image: file });
+      };
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            // Ürünleri ve kategorileri paralel olarak çek
+            const [productResponse, categoryResponse] = await Promise.all([
+              axios.get("http://siparisbankasi.com/products", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }),
+              axios.get("http://siparisbankasi.com/categories", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }),
+            ]);
+    
+            // Ürünler için Base64 formatına çevir
+            const productsWithBase64 = productResponse.data.map((product) => ({
+              ...product,
+              imageUrl: `data:image/png;base64,${product.product_image}`, // Görsel Base64 formatında
+            }));
+    
+            // Kategorileri ve ürünleri ayrı ayrı state'e ata
+            setProducts(productsWithBase64);
+            setCategories(categoryResponse.data);
+    
+            setLoading(false); // Yükleme tamamlandı
+          } catch (err) {
+            const status = err.response?.status;
+    
+            // Giriş hatalarını kontrol et
+            if (status === 401 || status === 400) {
+              window.location.href = "/Login";
+              localStorage.setItem("giris", 0);
+            }
+    
+            setError(err.message); // Hata durumunu sakla
+            setLoading(false);
+          }
+        };
+    
+        fetchData();
+      }, []);
+	
+
+
     const [openOrderModal, setOpenOrderModal] = useState({
         show: "",
         display: "none",
@@ -39,14 +117,86 @@ function Products() {
             [name]: value
         });
     };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+      
+        try {
+          // FormData oluşturulması
+          const formData = new FormData();
+          formData.append("product_name", product.product_name); // Ürün adı
+          formData.append("product_price", product.product_price); // Ürün fiyatı
+          formData.append("category_id", product.category_id); // Kategori ID
+          formData.append("product_barcode", product.product_barcode); // Barkod
+          formData.append("product_order", product.product_order); // Ürün sırası
+          formData.append("product_show", product.product_show); // Aktif/Pasif durumu
+          formData.append("product_description", product.product_description); // Ürün açıklaması
+          const firmid = localStorage.getItem("firmid");
+          formData.append("firmid", firmid);
+          // Eğer bir görsel seçildiyse ekle
+          if (product.product_image) {
+            formData.append("picture", product.product_image); // API tarafında "picture" olarak kabul ediliyor
+          }
+      
+          console.log("Gönderilen FormData:", Array.from(formData.entries())); // Debug için
+      
+          // API isteği gönderimi
+          const response = await axios.post("http://siparisbankasi.com/ProductSave", formData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // API güvenliği için token
+              "Content-Type": "multipart/form-data", // Dosya gönderimi için uygun content-type
+            },
+          });
+      
+          console.log("API yanıtı:", response.data);
+      
+          // Başarılı işlem sonrası formu sıfırlama
+          setSuccess(true);
+          OnCloseOrderModal();
 
-    const handleSubmit = (e) => {
+          
+          setError(null);
+          setProduct({
+            product_name: "",
+            product_price: "",
+            category_id: "",
+            product_barcode: "",
+            product_order: 0,
+            product_show: 1,
+            product_description: "",
+            product_image: null, // Görsel sıfırlanır
+          });
+        } catch (err) {
+          console.error("Hata oluştu:", err.response?.data || err.message);
+          setSuccess(false);
+          setError(err.response?.data?.message || "Ürün kaydedilemedi.");
+        }
+      };
+      
+    const handleTwoSubmit = (e) => {
         e.preventDefault(); // Sayfanın yeniden yüklenmesini önler
         console.log('Form Data:', formData);
         setMessage('Form successfully submitted!');
 
         // İsteğe göre burada API çağrısı yapabilirsiniz
     };
+
+    const handleEdit = (pro) => {
+        setProduct(pro);
+      
+        OnOpenOrderModal();
+        setModalTitle(pro.product_name +  " Güncelle");
+        console.log(product);
+      };
+
+      const handleAdd = () => {
+        setProduct({});
+       
+        OnOpenOrderModal();
+        setModalTitle("Yeni Ürün");
+        console.log("Ekleme işlemi");
+      };
+       // Başlığı Yeni Ürün olarak ayarla
+      
     return (
         <>
             <div className="content-wrapper">
@@ -74,7 +224,7 @@ function Products() {
                     </div>
 
                     <section className="content" style={{minHeight: "auto"}}>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleTwoSubmit}>
                         <div className="row">
                             <div className="col-12">
                                 <div className="box">
@@ -98,12 +248,8 @@ function Products() {
                                                     <label>Ürün Kategorisi</label>
                                                     <select className="form-control select2" style={{ width: "100%" }}>
                                                         <option selected="selected">Seçiniz</option>
-                                                        <option>Alaska</option>
-                                                        <option>California</option>
-                                                        <option>Delaware</option>
-                                                        <option>Tennessee</option>
-                                                        <option>Texas</option>
-                                                        <option>Washington</option>
+                                                        {categories.map((category, index) => (   <option value={category.category_id}>{category.category_name}</option>))}
+                                                       
                                                     </select>
                                                 </div>
                                             </div>
@@ -113,14 +259,14 @@ function Products() {
                                                     <label>Ürün Durum</label>
                                                     <select className="form-control select2" style={{ width: "100%" }}>
                                                         <option selected="selected">Seçiniz</option>
-                                                        <option>Aktif</option>
-                                                        <option>Pasif</option>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="0">Pasif</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div className='col-md-2' style={{ paddingLeft: 0 }}>
-                                                        <button type="button" className="btn btn-success btn-sm mt-25" onClick={() => OnOpenOrderModal()}>
+                                                        <button type="submit" className="btn btn-success btn-sm mt-25" onClick={() => handleAdd()}>
                                                             Ürün Ara
                                                         </button>
                                                     </div>
@@ -133,8 +279,69 @@ function Products() {
                         </form>
                     </section>
 
-
-                    <section class="content">
+                    <section className="content">
+      <div className="row">
+        {products.map((product, index) => (
+          <div key={index} className="col-xxxl-3 col-xl-4 col-lg-6 col-12">
+            <div className="box food-box">
+              <div className="box-body text-center">
+                <div className="menu-item">
+                  <img
+                    src={product.product_image} // API'den gelen ürün görseli
+                    className="img-fluid w-p75"
+                    alt={product.product_name}
+                  />
+                </div>
+                <div className="menu-details text-center">
+                  <h4 className="mt-20 mb-10">{product.product_name}</h4>
+                  <h6>{product.product_price} TL</h6>
+                  <p>{product.category}</p>
+                </div>
+                <div className="act-btn d-flex justify-content-between">
+                  <div className="text-center mx-5">
+                    <a
+                      href="#"
+                      className="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"
+                    >
+                      <i className="fa fa-eye-slash"></i>
+                    </a>
+                    <small className="d-block">View</small>
+                  </div>
+                  <div className="text-center mx-5">
+                    <a
+                      href="#" onClick={() => handleEdit(product)}
+                      className="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"
+                    >
+                      <i className="fa fa-edit"></i>
+                    </a>
+                    <small className="d-block">Düzenle</small>
+                  </div>
+                  <div className="text-center mx-5">
+                    <a
+                      href="#"
+                      className="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </a>
+                    <small className="d-block">Sil</small>
+                  </div>
+                  <div className="text-center mx-5">
+                    <a
+                      href="#"
+                      className="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"
+                    >
+                      <i className="fa fa-plus-square-o"></i>
+                    </a>
+                    <small className="d-block">Duplicate</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+                    {/* <section class="content">
                         <div class="row">
                             <div class="col-xxxl-3 col-xl-4 col-lg-6 col-12">
                                 <div class="box food-box">
@@ -407,7 +614,7 @@ function Products() {
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    </section> */}
                 </div>
             </div>
 
@@ -420,7 +627,7 @@ function Products() {
                 <div className="modal-dialog modal-xl">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title" id="myLargeModalLabel">Yeni Ürün</h4>
+                            <h4 className="modal-title" id="myLargeModalLabel">{modalTitle}</h4>
                             <button type="button" className="close" onClick={OnCloseOrderModal}>×</button>
                         </div>
                         <div className="modal-body">
@@ -430,38 +637,30 @@ function Products() {
                                 <div className='col-md-4'>
                                                 <div className="form-group">
                                                     <label>Ürün Kategorisi:</label>
-                                                    <select className="form-control select2" style={{ width: "100%" }}>
+                                                    <select name="category_id"  value={product.product_category_id || ""}  onChange={handleInputChange} className="form-control select2" style={{ width: "100%" }} required >
                                                         <option selected="selected">Seçiniz</option>
-                                                        <option>Alaska</option>
-                                                        <option>California</option>
-                                                        <option>Delaware</option>
-                                                        <option>Tennessee</option>
-                                                        <option>Texas</option>
-                                                        <option>Washington</option>
+                                                        {categories.map((category, index) => (   <option value={category.category_id} >{category.category_name}</option>))}
+                                                       
                                                     </select>
                                                 </div>
                                             </div>
                                             <div className='col-md-4'>
                                             <div className="form-group">
                                                     <label>Ürün Alt Kategorisi:</label>
-                                                    <select className="form-control select2" style={{ width: "100%" }}>
+                                                    <select  onChange={handleInputChange}   value={product.product_category_id || ""} className="form-control select2" style={{ width: "100%" }}>
                                                         <option selected="selected">Seçiniz</option>
-                                                        <option>Alaska</option>
-                                                        <option>California</option>
-                                                        <option>Delaware</option>
-                                                        <option>Tennessee</option>
-                                                        <option>Texas</option>
-                                                        <option>Washington</option>
+                                                        {categories.map((category, index) => (   <option value={category.category_id}>{category.category_name}</option>))}
+                                                       
                                                     </select>
                                                 </div>
                                             </div>
-
+                                
 
                                             <div className='col-md-4'>
                                                         <div className="form-group">
                                                             <label>Ürün Sırası:</label>
                                                             <div className="input-group">
-                                                                <input type="text" className="form-control" />
+                                                                <input  onChange={handleInputChange}  value={product.product_order || ""}  type="text" name="product_order"  className="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -470,7 +669,7 @@ function Products() {
                                                         <div className="form-group">
                                                             <label>Ürün Adı:</label>
                                                             <div className="input-group">
-                                                                <input type="text" className="form-control" />
+                                                                <input  onChange={handleInputChange} value={product.product_name || ""} name="product_name" type="text" className="form-control" required />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -481,7 +680,7 @@ function Products() {
                                                         <div className="form-group">
                                                             <label>Ürün Barkodu:</label>
                                                             <div className="input-group">
-                                                                <input type="text" className="form-control" />
+                                                                <input  onChange={handleInputChange} value={product.product_barcode || ""} type="text" name="product_barcode" className="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -489,20 +688,11 @@ function Products() {
                                                     <div class="col-md-4">
 									<div class="form-group">
 										<label class="font-weight-700 font-size-16">Ürün Durumu</label>
-										<div class="radio-list">
-											<label class="radio-inline p-0 mr-10">
-												<div class="radio radio-info">
-													<input type="radio" name="radio" id="radio1" value="option1"/>
-													<label for="radio1">Aktif</label>
-												</div>
-											</label>
-											<label class="radio-inline">
-												<div class="radio radio-info">
-													<input type="radio" name="radio" id="radio2" value="option2"/>
-													<label for="radio2">Pasif</label>
-												</div>
-											</label>
-										</div>
+                                        <select onChange={handleInputChange} name="product_order" value={product.product_order || ""} className="form-control select2" style={{ width: "100%" }}>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="0">Pasif</option>
+                                                       
+                                                    </select>
 									</div>
 								</div>
 
@@ -511,7 +701,7 @@ function Products() {
 										<label class="font-weight-700 font-size-16">Ürün Fiyatı:</label>
 										<div class="input-group">
 											<div class="input-group-addon">TL</div>
-											<input type="text" class="form-control" placeholder="270" /> </div>
+											<input onChange={handleInputChange} value={product.product_price || ""} name="product_price" type="text" class="form-control" required  /> </div>
 									</div>
 								</div>
 
@@ -520,7 +710,7 @@ function Products() {
                                                         <label class="col-form-label">Ürün Resim</label>
                                                        
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" id="customFile" />
+                                                                <input  onChange={handleFileChange} name="product_image" type="file" class="custom-file-input" id="customFile" />
                                                                 <label class="custom-file-label" for="customFile">Görsel Seçiniz</label>
                                                             </div>
                                                        
@@ -530,7 +720,7 @@ function Products() {
                                                         <div className="form-group">
                                                             <label>Ürün Detay:</label>
                                                             <div className="input-group">
-                                                                <textarea type="text" className="form-control" ></textarea> 
+                                                                <textarea onChange={handleInputChange} value={product.product_description || ""}  name="product_description" type="text" className="form-control" required ></textarea> 
                                                             </div>
                                                         </div>
                                                     </div>
@@ -657,12 +847,13 @@ function Products() {
                                     
 
                                 </div>
+                                <div className="modal-footer">
+                           
+                           <button type="submit" className="btn btn-success text-right" style={{ float: 'right' }}>Ürün Ekle</button>
+                       </div>
                             </form>
                         </div>
-                        <div className="modal-footer">
-                           
-                            <button type="button" className="btn btn-success text-right" style={{ float: 'right' }}>Ürün Ekle</button>
-                        </div>
+                       
                     </div>
                 </div>
             </div>
